@@ -1,101 +1,59 @@
 # ais
 
-Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief for unblocking stuck GitHub PRs.
+Fast, deterministic, failure-first PR triage CLI.
 
-Zero LLM calls. Exact `o200k_base` token budgeting. Cross-platform (Windows, macOS, Linux).
-
-## Why `ais`?
-
-Raw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes, resolved review chatter, and third-party stack frames into your context window. `ais` deterministically strips the noise and compiles only what you need to unblock a PR:
-
-1. **Failing CI Checks (~45% budget)** — Strips ANSI codes, timestamps, runner setup/teardown blocks, and third-party/stdlib stack frames (`node_modules`, `site-packages`, `/usr/local/go`, etc.). Retains job/step name, command, primary error, and user-land frames.
-2. **Unresolved Review Hunks (~35% budget)** — Fetches only `isResolved: false` threads via GitHub GraphQL, drops outdated/collapsed noise and bot badge markup, and anchors each comment to its 5–10 line diff hunk. Switches to compact 1-line summaries on overflow unless `--full` is set.
-3. **Filtered Blast Radius (~15% budget)** — Scopes strictly to files and symbols already referenced in failing stack traces or unresolved reviews, emitting `file -> symbol -> callers | tests` tuples via local `git grep`.
-
-## Requirements
-
-- Node.js 20+
-- GitHub credentials via `GITHUB_TOKEN` or an authenticated [GitHub CLI (`gh`)](https://cli.github.com/) session
+`ais fix` compiles failing CI logs, unresolved review threads, and scoped blast-radius context into a single **sub-1,000-token Markdown brief**—built to pipe straight into Claude Code, Codex, or any coding agent without burning context on raw `gh` output.
 
 ## Installation
 
-bash
-git clone [https://github.com/ktsomani/ais.git](https://github.com/ktsomani/ais.git)
-cd ais
-npm install
-npm run build
-npm link
+Run directly with `npx`:
 
+```bash
+npx useais fix
+```
 
-## Authentication
+Or install globally to use the `ais` command anywhere:
 
-`ais` requires no login flow or config file. It resolves credentials automatically in this order:
-
-1. process.env.GITHUB_TOKEN`
-2. gh auth token`
+```bash
+npm install -g useais
+ais fix
+```
 
 ## Usage
 
-bash
-# Auto-detect the open PR for your current local git branch
+```bash
+# Auto-detect the PR for your current git branch
 ais fix
 
-# Triage by PR number in the current repo
+# Target a PR by number (in current repo) or full GitHub URL
 ais fix 42
-
-# Triage any PR by URL
 ais fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pull/42)
+```
 
+### Authentication
 
-### Flags
+`ais` automatically uses your existing GitHub CLI session (`gh auth login`) or a `GITHUB_TOKEN` environment variable.
 
-| Flag | Default | Description |
-| :--- | :--- | :--- |
-| `--budget <number>` | `1000` | Max token cap counted with `o200k_base` |
-| `--full` | `false` | Disable truncation when unresolved review threads overflow the budget |
-| `--json` | `false` | Output structured JSON instead of Markdown (for eval pipelines) |
+## Using with Coding Agents (Claude Code & Codex)
 
-### Piping to Coding Agents
+Pipe a compiled brief directly into your agent to unblock a PR without feeding it tens of thousands of tokens of noisy CI logs:
 
-bash
-ais fix 42 | pbcopy                     # macOS
-ais fix 42 | clip                       # Windows
-ais fix 42 --json > pr-brief.json       # Downstream evals
+```bash
+# Claude Code
+ais fix 42 | claude -p "Fix the failing CI checks and address every unresolved review thread."
 
+# OpenAI Codex CLI
+codex "Fix the issues in this PR brief:\n$(ais fix 42)"
+```
 
-## Example Output
+### Auto-trigger via `CLAUDE.md` or `AGENTS.md`
 
-md
-# PR #42: Fix JWT expiry check (fix/jwt-exp)
-Tokens: 412/1000 | Failed Checks: 1 | Unresolved Threads: 1
+Add this to your repository's `CLAUDE.md` or `AGENTS.md` so agents default to `ais` before inspecting raw PR diffs or Actions logs:
 
-## 1. Failing CI
-- **unit-tests (npm test)**: `FAIL src/auth/jwt.test.ts > verifySession > rejects expired tokens`
-  text
-  $ npm test
-  AssertionError: expected true to be false
-  ❯ src/auth/jwt.test.ts:42:28
-  at verifySession (src/auth/jwt.ts:19:12)
-
-## 2. Unresolved Reviews
-- **`src/auth/jwt.ts:24`** (@alice): Check `exp` against UTC seconds instead of milliseconds.
-  diff
-  const payload = decode(token);
-  if (!payload) return false;
-  const now = Date.now();
-  - return payload.exp > now;
-  + return payload.exp >= now;
-  
-
-## 3. Blast Radius
-- src/auth/jwt.ts -> verifySession -> callers: [src/routes/login.ts] | tests: [src/auth/jwt.test.ts]
-
-
-## Development
-
-bash
-npm run build   # Compile TypeScript to dist/
-npm test        # Run Vitest unit test suite
+```markdown
+## PR Triage
+When asked to fix CI failures or address review comments on a PR, run `npx useais fix` first instead of fetching raw `gh pr view` output or full Actions logs.
+```
 
 ## Benchmarks (10 Live PRs)
 
@@ -114,3 +72,9 @@ Measured with `o200k_base` comparing raw PR context (`gh pr view` + `gh pr diff`
 | `kubernetes/kubernetes#144461` | 5,165 | 80 | 64.6x | 0 | 0 | 2.5s |
 | `kubernetes/kubernetes#144410` | 4,623 | 447 | 10.3x | 0 | 2 | 2.5s |
 | **Total** | **142,149** | **3,845** | **37.0x** | **20** | **11** | **4.2s avg** |
+
+Every PR stayed strictly under the 1,000-token cap (max 844 tokens).
+
+## License
+
+MIT

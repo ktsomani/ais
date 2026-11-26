@@ -1,10 +1,11 @@
 {
-  "name": "ais",
+  "name": "useais",
   "version": "0.1.0",
   "description": "Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief.",
   "type": "module",
   "bin": {
-    "ais": "./dist/cli.js"
+    "ais": "dist/cli.js",
+    "useais": "dist/cli.js"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -22,5 +23,9 @@
     "@types/node": "^22.20.7",
     "typescript": "^5.6.3",
     "vitest": "^2.1.4"
-  }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }
