@@ -1,10 +1,10 @@
 {
-  "name": "haq",
+  "name": "ais",
   "version": "0.1.0",
   "description": "Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief.",
   "type": "module",
   "bin": {
-    "haq": "./dist/cli.js"
+    "ais": "./dist/cli.js"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -1,12 +1,12 @@
-# haq
+# ais
 
 Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief for unblocking stuck GitHub PRs.
 
 Zero LLM calls. Exact `o200k_base` token budgeting. Cross-platform (Windows, macOS, Linux).
 
-## Why `haq`?
+## Why `ais`?
 
-Raw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes, resolved review chatter, and third-party stack frames into your context window. `haq` deterministically strips the noise and compiles only what you need to unblock a PR:
+Raw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes, resolved review chatter, and third-party stack frames into your context window. `ais` deterministically strips the noise and compiles only what you need to unblock a PR:
 
 1. **Failing CI Checks (~45% budget)** — Strips ANSI codes, timestamps, runner setup/teardown blocks, and third-party/stdlib stack frames (`node_modules`, `site-packages`, `/usr/local/go`, etc.). Retains job/step name, command, primary error, and user-land frames.
 2. **Unresolved Review Hunks (~35% budget)** — Fetches only `isResolved: false` threads via GitHub GraphQL, drops outdated/collapsed noise and bot badge markup, and anchors each comment to its 5–10 line diff hunk. Switches to compact 1-line summaries on overflow unless `--full` is set.
@@ -20,8 +20,8 @@ Raw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes
 ## Installation
 
 bash
-git clone [https://github.com/ktsomani/haq.git](https://github.com/ktsomani/haq.git)
-cd haq
+git clone [https://github.com/ktsomani/ais.git](https://github.com/ktsomani/ais.git)
+cd ais
 npm install
 npm run build
 npm link
@@ -29,7 +29,7 @@ npm link
 
 ## Authentication
 
-`haq` requires no login flow or config file. It resolves credentials automatically in this order:
+`ais` requires no login flow or config file. It resolves credentials automatically in this order:
 
 1. process.env.GITHUB_TOKEN`
 2. gh auth token`
@@ -38,13 +38,13 @@ npm link
 
 bash
 # Auto-detect the open PR for your current local git branch
-haq fix
+ais fix
 
 # Triage by PR number in the current repo
-haq fix 42
+ais fix 42
 
 # Triage any PR by URL
-haq fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pull/42)
+ais fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pull/42)
 
 
 ### Flags
@@ -58,9 +58,9 @@ haq fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pu
 ### Piping to Coding Agents
 
 bash
-haq fix 42 | pbcopy                     # macOS
-haq fix 42 | clip                       # Windows
-haq fix 42 --json > pr-brief.json       # Downstream evals
+ais fix 42 | pbcopy                     # macOS
+ais fix 42 | clip                       # Windows
+ais fix 42 --json > pr-brief.json       # Downstream evals
 
 
 ## Example Output
@@ -99,9 +99,9 @@ npm test        # Run Vitest unit test suite
 
 ## Benchmarks (10 Live PRs)
 
-Measured with `o200k_base` comparing raw PR context (`gh pr view` + `gh pr diff`) against `haq fix`:
+Measured with `o200k_base` comparing raw PR context (`gh pr view` + `gh pr diff`) against `ais fix`:
 
-| PR | Raw Tokens | `haq` Tokens | Ratio | CI Checks | Reviews | Time |
+| PR | Raw Tokens | `ais` Tokens | Ratio | CI Checks | Reviews | Time |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `twentyhq/twenty#31534` | 22,881 | 338 | 67.7x | 2 | 1 | 6.3s |
 | `twentyhq/twenty#31494` | 30,255 | 844 | 35.8x | 1 | 4 | 6.6s |

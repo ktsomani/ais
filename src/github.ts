@@ -28,7 +28,7 @@ export class GitHubClient {
       Authorization: `Bearer ${this.token}`,
       Accept: accept,
       'X-GitHub-Api-Version': '2022-11-28',
-      'User-Agent': 'haq-cli/0.1.0',
+      'User-Agent': 'ais-cli/0.1.0',
     };
   }
 

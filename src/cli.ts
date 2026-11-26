@@ -12,7 +12,7 @@ declare const process: {
 const program = new Command();
 
 program
-  .name('haq')
+  .name('ais')
   .description('Fast, deterministic, failure-first PR triage CLI')
   .version('0.1.0');
 

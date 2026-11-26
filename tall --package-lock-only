@@ -1,0 +1,128 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/github.ts', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 991df28..348e1c3 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,12 +1,12 @@[m
+[31m-# haq[m
+[32m+[m[32m# ais[m
+ [m
+ Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief for unblocking stuck GitHub PRs.[m
+ [m
+ Zero LLM calls. Exact `o200k_base` token budgeting. Cross-platform (Windows, macOS, Linux).[m
+ [m
+[31m-## Why `haq`?[m
+[32m+[m[32m## Why `ais`?[m
+ [m
+[31m-Raw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes, resolved review chatter, and third-party stack frames into your context window. `haq` deterministically strips the noise and compiles only what you need to unblock a PR:[m
+[32m+[m[32mRaw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes, resolved review chatter, and third-party stack frames into your context window. `ais` deterministically strips the noise and compiles only what you need to unblock a PR:[m
+ [m
+ 1. **Failing CI Checks (~45% budget)** — Strips ANSI codes, timestamps, runner setup/teardown blocks, and third-party/stdlib stack frames (`node_modules`, `site-packages`, `/usr/local/go`, etc.). Retains job/step name, command, primary error, and user-land frames.[m
+ 2. **Unresolved Review Hunks (~35% budget)** — Fetches only `isResolved: false` threads via GitHub GraphQL, drops outdated/collapsed noise and bot badge markup, and anchors each comment to its 5–10 line diff hunk. Switches to compact 1-line summaries on overflow unless `--full` is set.[m
+[36m@@ -20,8 +20,8 @@[m [mRaw GitHub PRs dump tens of thousands of tokens of runner setup logs, ANSI codes[m
+ ## Installation[m
+ [m
+ bash[m
+[31m-git clone [https://github.com/ktsomani/haq.git](https://github.com/ktsomani/haq.git)[m
+[31m-cd haq[m
+[32m+[m[32mgit clone [https://github.com/ktsomani/ais.git](https://github.com/ktsomani/ais.git)[m
+[32m+[m[32mcd ais[m
+ npm install[m
+ npm run build[m
+ npm link[m
+[36m@@ -29,7 +29,7 @@[m [mnpm link[m
+ [m
+ ## Authentication[m
+ [m
+[31m-`haq` requires no login flow or config file. It resolves credentials automatically in this order:[m
+[32m+[m[32m`ais` requires no login flow or config file. It resolves credentials automatically in this order:[m
+ [m
+ 1. process.env.GITHUB_TOKEN`[m
+ 2. gh auth token`[m
+[36m@@ -38,13 +38,13 @@[m [mnpm link[m
+ [m
+ bash[m
+ # Auto-detect the open PR for your current local git branch[m
+[31m-haq fix[m
+[32m+[m[32mais fix[m
+ [m
+ # Triage by PR number in the current repo[m
+[31m-haq fix 42[m
+[32m+[m[32mais fix 42[m
+ [m
+ # Triage any PR by URL[m
+[31m-haq fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pull/42)[m
+[32m+[m[32mais fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pull/42)[m
+ [m
+ [m
+ ### Flags[m
+[36m@@ -58,9 +58,9 @@[m [mhaq fix [https://github.com/owner/repo/pull/42](https://github.com/owner/repo/pu[m
+ ### Piping to Coding Agents[m
+ [m
+ bash[m
+[31m-haq fix 42 | pbcopy                     # macOS[m
+[31m-haq fix 42 | clip                       # Windows[m
+[31m-haq fix 42 --json > pr-brief.json       # Downstream evals[m
+[32m+[m[32mais fix 42 | pbcopy                     # macOS[m
+[32m+[m[32mais fix 42 | clip                       # Windows[m
+[32m+[m[32mais fix 42 --json > pr-brief.json       # Downstream evals[m
+ [m
+ [m
+ ## Example Output[m
+[36m@@ -99,9 +99,9 @@[m [mnpm test        # Run Vitest unit test suite[m
+ [m
+ ## Benchmarks (10 Live PRs)[m
+ [m
+[31m-Measured with `o200k_base` comparing raw PR context (`gh pr view` + `gh pr diff`) against `haq fix`:[m
+[32m+[m[32mMeasured with `o200k_base` comparing raw PR context (`gh pr view` + `gh pr diff`) against `ais fix`:[m
+ [m
+[31m-| PR | Raw Tokens | `haq` Tokens | Ratio | CI Checks | Reviews | Time |[m
+[32m+[m[32m| PR | Raw Tokens | `ais` Tokens | Ratio | CI Checks | Reviews | Time |[m
+ | :--- | ---: | ---: | ---: | ---: | ---: | ---: |[m
+ | `twentyhq/twenty#31534` | 22,881 | 338 | 67.7x | 2 | 1 | 6.3s |[m
+ | `twentyhq/twenty#31494` | 30,255 | 844 | 35.8x | 1 | 4 | 6.6s |[m
+[1mdiff --git a/package.json b/package.json[m
+[1mindex 6e186c1..b24a16f 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -1,10 +1,10 @@[m
+ {[m
+[31m-  "name": "haq",[m
+[32m+[m[32m  "name": "ais",[m
+   "version": "0.1.0",[m
+   "description": "Fast, deterministic, failure-first PR triage CLI that compiles a sub-1,000-token Markdown brief.",[m
+   "type": "module",[m
+   "bin": {[m
+[31m-    "haq": "./dist/cli.js"[m
+[32m+[m[32m    "ais": "./dist/cli.js"[m
+   },[m
+   "engines": {[m
+     "node": ">=20.0.0"[m
+[1mdiff --git a/src/cli.ts b/src/cli.ts[m
+[1mindex d81725d..b30ad04 100644[m
+[1m--- a/src/cli.ts[m
+[1m+++ b/src/cli.ts[m
+[36m@@ -12,7 +12,7 @@[m [mdeclare const process: {[m
+ const program = new Command();[m
+ [m
+ program[m
+[31m-  .name('haq')[m
+[32m+[m[32m  .name('ais')[m
+   .description('Fast, deterministic, failure-first PR triage CLI')[m
+   .version('0.1.0');[m
+ [m
+[1mdiff --git a/src/github.ts b/src/github.ts[m
+[1mindex e56b2fd..da9ea3c 100644[m
+[1m--- a/src/github.ts[m
+[1m+++ b/src/github.ts[m
+[36m@@ -28,7 +28,7 @@[m [mexport class GitHubClient {[m
+       Authorization: `Bearer ${this.token}`,[m
+       Accept: accept,[m
+       'X-GitHub-Api-Version': '2022-11-28',[m
+[31m-      'User-Agent': 'haq-cli/0.1.0',[m
+[32m+[m[32m      'User-Agent': 'ais-cli/0.1.0',[m
+     };[m
+   }[m
+ [m
